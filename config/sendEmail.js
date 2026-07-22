@@ -9,7 +9,7 @@ const transporter = nodemailer.createTransport({
 });
 
 const sendVerificationEmail = async (toEmail, token) => {
-  const verifyLink = `http://localhost:5000/api/auth/verify-email/${token}`;
+  const verifyLink = `https://fullstackbackend-project.bonto.run/api/auth/verify-email/${token}`;
 
   await transporter.sendMail({
     from: process.env.EMAIL_USER,
