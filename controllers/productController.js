@@ -34,7 +34,7 @@ const createProduct = async (req, res) => {
 
 const getProducts = async (req, res) => {
   try {
-    const { search, category, minPrice, maxPrice } = req.query;
+    const { search, category, minPrice, maxPrice, page = 1, limit = 8 } = req.query;
 
     let filter = {};
 
@@ -52,11 +52,24 @@ const getProducts = async (req, res) => {
       if (maxPrice) filter.price.$lte = Number(maxPrice);
     }
 
+    const pageNumber = Number(page);
+    const pageLimit = Number(limit);
+    const skip = (pageNumber - 1) * pageLimit;
+
+    const totalProducts = await Product.countDocuments(filter);
+
     const products = await Product.find(filter)
       .populate("category", "name")
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(pageLimit);
 
-    return res.status(200).json(products);
+    return res.status(200).json({
+      products,
+      totalPages: Math.ceil(totalProducts / pageLimit),
+      currentPage: pageNumber,
+      totalProducts,
+    });
   } catch (error) {
     return res.status(500).json({ message: "Server error" });
   }

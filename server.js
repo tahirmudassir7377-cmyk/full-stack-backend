@@ -7,9 +7,15 @@ require("dotenv").config();
 
 const app = express();
 
+const allowedOrigins = [
+  "https://full-stack-frontend-peach.vercel.app",
+  "http://localhost:5173",
+  "http://localhost:5174",
+].filter(Boolean);
+
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL,
+    origin: allowedOrigins,
     credentials: true,
   })
 );
