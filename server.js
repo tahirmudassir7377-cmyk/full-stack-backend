@@ -37,6 +37,15 @@ app.use("/api/categories", categoryRoutes);
 const productRoutes = require("./routes/productRoutes");
 app.use("/api/products", productRoutes);
 
+const cartRoutes = require("./routes/cartRoutes");
+app.use("/api/cart", cartRoutes);
+
+const wishlistRoutes = require("./routes/wishlistRoutes");
+app.use("/api/wishlist", wishlistRoutes);
+
+const orderRoutes = require("./routes/orderRoutes");
+app.use("/api/orders", orderRoutes);
+
 app.get("/", (req, res) => {
   res.send("Backend is Running");
 });
