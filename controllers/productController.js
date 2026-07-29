@@ -59,10 +59,12 @@ const getProducts = async (req, res) => {
     const totalProducts = await Product.countDocuments(filter);
 
     const products = await Product.find(filter)
+      .select("name description price stock image category createdAt")
       .populate("category", "name")
       .sort({ createdAt: -1 })
       .skip(skip)
-      .limit(pageLimit);
+      .limit(pageLimit)
+      .lean();
 
     return res.status(200).json({
       products,
@@ -78,7 +80,9 @@ const getProducts = async (req, res) => {
 const getProductById = async (req, res) => {
   try {
     const { id } = req.params;
-    const product = await Product.findById(id).populate("category", "name");
+    const product = await Product.findById(id)
+      .populate("category", "name")
+      .lean();
 
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
