@@ -2,7 +2,10 @@ const Product = require("../models/Product");
 
 const createProduct = async (req, res) => {
   try {
-    const { name, description, price, stock, category } = req.body;
+    const name = req.body.name?.trim();
+    const description = req.body.description?.trim();
+    const category = req.body.category?.trim();
+    const { price, stock } = req.body;
 
     if (!name || !description || !price || !category) {
       return res.status(400).json({ message: "All fields are required" });
@@ -59,12 +62,10 @@ const getProducts = async (req, res) => {
     const totalProducts = await Product.countDocuments(filter);
 
     const products = await Product.find(filter)
-      .select("name description price stock image category createdAt")
       .populate("category", "name")
       .sort({ createdAt: -1 })
       .skip(skip)
-      .limit(pageLimit)
-      .lean();
+      .limit(pageLimit);
 
     return res.status(200).json({
       products,
@@ -80,9 +81,7 @@ const getProducts = async (req, res) => {
 const getProductById = async (req, res) => {
   try {
     const { id } = req.params;
-    const product = await Product.findById(id)
-      .populate("category", "name")
-      .lean();
+    const product = await Product.findById(id).populate("category", "name");
 
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
@@ -97,7 +96,10 @@ const getProductById = async (req, res) => {
 const updateProduct = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, description, price, stock, category } = req.body;
+    const name = req.body.name?.trim();
+    const description = req.body.description?.trim();
+    const category = req.body.category?.trim();
+    const { price, stock } = req.body;
 
     const product = await Product.findById(id);
     if (!product) {
