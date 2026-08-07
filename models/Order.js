@@ -12,11 +12,10 @@ const orderSchema = new mongoose.Schema(
         product: {
           type: mongoose.Schema.Types.ObjectId,
           ref: "Product",
-          required: true,
         },
-        name: { type: String, required: true },
-        price: { type: Number, required: true },
-        quantity: { type: Number, required: true },
+        name: String,
+        price: Number,
+        quantity: Number,
       },
     ],
     totalAmount: {
@@ -24,20 +23,21 @@ const orderSchema = new mongoose.Schema(
       required: true,
     },
     shippingAddress: {
-      fullName: { type: String, required: true },
-      address: { type: String, required: true },
-      city: { type: String, required: true },
-      phone: { type: String, required: true },
+      fullName: String,
+      address: String,
+      city: String,
+      phone: String,
     },
-    status: {
+    paymentStatus: {
       type: String,
-      enum: ["pending", "processing", "shipped", "delivered", "cancelled"],
+      enum: ["pending", "paid", "failed"],
       default: "pending",
+    },
+    stripeSessionId: {
+      type: String,
     },
   },
   { timestamps: true }
 );
-
-orderSchema.index({ user: 1 });
 
 module.exports = mongoose.model("Order", orderSchema);

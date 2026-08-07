@@ -46,6 +46,9 @@ app.use("/api/wishlist", wishlistRoutes);
 const orderRoutes = require("./routes/orderRoutes");
 app.use("/api/orders", orderRoutes);
 
+const paymentRoutes = require("./routes/paymentRoutes");
+app.use("/api/payment", paymentRoutes);
+
 app.get("/", (req, res) => {
   res.send("Backend is Running");
 });
