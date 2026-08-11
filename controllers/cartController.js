@@ -12,6 +12,14 @@ const getCart = async (req, res) => {
       cart = await Cart.create({ user: req.user.id, items: [] });
     }
 
+    // Self-healing: agar kisi item ka product delete ho chuka hai (populate null),
+    // usay cart se hata do taake frontend kabhi null product na dekhe
+    const hasStaleItems = cart.items.some((item) => item.product === null);
+    if (hasStaleItems) {
+      cart.items = cart.items.filter((item) => item.product !== null);
+      await cart.save();
+    }
+
     return res.status(200).json(cart);
   } catch (error) {
     return res.status(500).json({ message: "Server error" });
