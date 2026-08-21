@@ -1,17 +1,22 @@
 const express = require("express");
+const http = require("http");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const path = require("path");
 require("dotenv").config();
+const { initSocket } = require("./utils/socket");
 
 const app = express();
+const server = http.createServer(app);
 
 const allowedOrigins = [
   "https://full-stack-frontend-peach.vercel.app",
   "http://localhost:5173",
   "http://localhost:5174",
 ].filter(Boolean);
+
+initSocket(server, allowedOrigins);
 
 app.use(
   cors({
@@ -52,12 +57,21 @@ app.use("/api/payment", paymentRoutes);
 const adminRoutes = require("./routes/adminRoutes");
 app.use("/api/admin", adminRoutes);
 
+const contactRoutes = require("./routes/contactRoutes");
+app.use("/api/contact", contactRoutes);
+
+const newsletterRoutes = require("./routes/newsletterRoutes");
+app.use("/api/newsletter", newsletterRoutes);
+
+const profileRoutes = require("./routes/profileRoutes");
+app.use("/api/profile", profileRoutes);
+
 app.get("/", (req, res) => {
   res.send("Backend is Running");
 });
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

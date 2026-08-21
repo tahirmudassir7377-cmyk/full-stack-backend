@@ -6,6 +6,7 @@ const {
   updateUserRole,
   deleteUser,
   getAllOrders,
+  updateOrderStatus,
 } = require("../controllers/adminController");
 const protect = require("../middleware/authMiddleware");
 const isAdmin = require("../middleware/adminMiddleware");
@@ -15,5 +16,6 @@ router.get("/users", protect, isAdmin, getAllUsers);
 router.put("/users/:id/role", protect, isAdmin, updateUserRole);
 router.delete("/users/:id", protect, isAdmin, deleteUser);
 router.get("/orders", protect, isAdmin, getAllOrders);
+router.put("/orders/:id/status", protect, isAdmin, updateOrderStatus);
 
 module.exports = router;

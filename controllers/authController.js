@@ -161,5 +161,26 @@ const resendVerification = async (req, res) => {
     return res.status(500).json({ message: "Server error" });
   }
 };
+const updateProfile = async (req, res) => {
+  try {
+    const { id } = req.user;
+    const name = req.body.name?.trim();
 
-module.exports = { signup, login, logout, getProfile, verifyEmail, resendVerification };
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (name) user.name = name;
+
+    await user.save();
+
+    return res.status(200).json({
+      message: "Profile updated successfully",
+      user: { id: user._id, name: user.name, email: user.email },
+    });
+  } catch (error) {
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+module.exports = { signup, login, logout, getProfile, verifyEmail, resendVerification, updateProfile };

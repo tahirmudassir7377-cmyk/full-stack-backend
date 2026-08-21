@@ -1,6 +1,7 @@
 const User = require("../models/User");
 const Product = require("../models/Product");
 const Order = require("../models/Order");
+const { getIO } = require("../utils/socket");
 
 const getDashboardStats = async (req, res) => {
   try {
@@ -89,10 +90,44 @@ const getAllOrders = async (req, res) => {
   }
 };
 
+const updateOrderStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    if (!["processing", "shipped", "delivered", "cancelled"].includes(status)) {
+      return res.status(400).json({ message: "Invalid status" });
+    }
+
+    const order = await Order.findById(id);
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    order.status = status;
+    await order.save();
+
+    try {
+      const io = getIO();
+      io.to(order.user.toString()).emit("orderStatusUpdate", {
+        orderId: order._id,
+        status: order.status,
+      });
+    } catch (socketError) {
+      console.error("Socket emit error:", socketError);
+    }
+
+    return res.status(200).json(order);
+  } catch (error) {
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+
 module.exports = {
   getDashboardStats,
   getAllUsers,
   updateUserRole,
   deleteUser,
   getAllOrders,
+  updateOrderStatus,
 };

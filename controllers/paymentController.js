@@ -2,6 +2,7 @@ const Stripe = require("stripe");
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 const Cart = require("../models/Cart");
 const Order = require("../models/Order");
+const { getIO } = require("../utils/socket");
 
 const createCheckoutSession = async (req, res) => {
   try {
@@ -110,6 +111,17 @@ const verifyPayment = async (req, res) => {
 
     cart.items = [];
     await cart.save();
+
+    try {
+      const io = getIO();
+      io.to("admin").emit("newOrder", {
+        orderId: order._id,
+        totalAmount: order.totalAmount,
+        customerName: shippingAddress.fullName,
+      });
+    } catch (socketError) {
+      console.error("Socket emit error:", socketError);
+    }
 
     return res.status(201).json(order);
   } catch (error) {
